@@ -11,8 +11,9 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-# Ask for new SSH port
-read -p "Please enter the new SSH port (default is 22): " NEW_SSH_PORT
+# Ask for new SSH port (force read from terminal)
+echo -n "Please enter the new SSH port (default is 22): " > /dev/tty
+read NEW_SSH_PORT < /dev/tty
 NEW_SSH_PORT=${NEW_SSH_PORT:-22}
 echo "You have chosen port: $NEW_SSH_PORT"
 
@@ -29,9 +30,7 @@ cp "$DESTINATION" "$BACKUP"
 
 # Inject new port
 echo "🚚 Replacing the sshd_config file and setting the new port"
-# Remove old port line(s)
 sed -i '/^Port /d' /tmp/sshd_config
-# Add new port at the top
 echo "Port $NEW_SSH_PORT" | cat - /tmp/sshd_config > /tmp/sshd_config.new
 mv /tmp/sshd_config.new /tmp/sshd_config
 
