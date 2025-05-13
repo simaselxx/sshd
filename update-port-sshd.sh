@@ -31,11 +31,11 @@ echo "📁 Backing up the current file to $BACKUP"
 cp "$DESTINATION" "$BACKUP"
 
 echo "🚚 Replacing the sshd_config file and setting the new port"
-# If Port 22 is not commented, replace the port line directly, else add it
-if grep -q "^Port" /tmp/sshd_config; then
-  sed -i "s/^Port .*/Port $NEW_SSH_PORT/" /tmp/sshd_config
+# Check if Port is commented and update accordingly
+if grep -q "^#Port" /tmp/sshd_config; then
+  sed -i "s/^#Port 22/Port $NEW_SSH_PORT/" /tmp/sshd_config
 else
-  sed -i "1i Port $NEW_SSH_PORT" /tmp/sshd_config
+  sed -i "s/^Port .*/Port $NEW_SSH_PORT/" /tmp/sshd_config
 fi
 
 # Replace the current sshd_config with the updated one
