@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # تنظیمات
-GITHUB_URL="https://raw.githubusercontent.com/USERNAME/REPO/BRANCH/sshd_config"
+SSHD_CONFIG_URL="https://raw.githubusercontent.com/simaselxx/sshd/main/sshd_config"
 DESTINATION="/etc/ssh/sshd_config"
 BACKUP="/etc/ssh/sshd_config.backup.$(date +%F_%T)"
 
