@@ -10,16 +10,29 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-# Ask the user for the new SSH port
-echo "Please enter the new SSH port (default is 22):"
-read NEW_SSH_PORT
-
-# If the user doesn't enter anything, set default port to 22
-if [ -z "$NEW_SSH_PORT" ]; then
-  NEW_SSH_PORT=22
-fi
-
-echo "You have chosen port: $NEW_SSH_PORT"
+# Ask the user for the new SSH port using select
+echo "Please choose the new SSH port (default is 22):"
+select NEW_SSH_PORT in "22" "1001" "Other"; do
+  case $NEW_SSH_PORT in
+    "22")
+      echo "You have chosen port 22"
+      break
+      ;;
+    "1001")
+      echo "You have chosen port 1001"
+      break
+      ;;
+    "Other")
+      echo "Please enter the new port:"
+      read NEW_SSH_PORT
+      echo "You have chosen port: $NEW_SSH_PORT"
+      break
+      ;;
+    *)
+      echo "Invalid option, please try again."
+      ;;
+  esac
+done
 
 echo "📦 Downloading the new sshd_config file from GitHub..."
 curl -fsSL "$SSHD_CONFIG_URL" -o /tmp/sshd_config || {
@@ -45,11 +58,3 @@ chmod 600 "$DESTINATION"
 echo "🧪 Testing the new configuration with sshd -t"
 sshd -t
 if [ $? -ne 0 ]; then
-  echo "❌ Error in the new configuration! The previous file will be restored."
-  cp "$BACKUP" "$DESTINATION"
-  systemctl restart ssh
-  exit 1
-fi
-
-echo "✅ The configuration is correct. Restarting SSH"
-systemctl restart ssh && echo "🔁 SSH has been successfully restarted."
