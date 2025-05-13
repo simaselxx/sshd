@@ -9,7 +9,6 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-# دریافت پورت از کاربر با استفاده از read
 echo "Please enter the new SSH port (default is 22):"
 read -r NEW_SSH_PORT
 NEW_SSH_PORT=${NEW_SSH_PORT:-22}
@@ -25,7 +24,7 @@ echo "📁 Backing up the current file to $BACKUP"
 cp "$DESTINATION" "$BACKUP"
 
 echo "🚚 Replacing the sshd_config file and setting the new port"
-# حذف خطوط قبلی Port و اضافه کردن Port جدید
+# Remove existing Port lines and prepend new one
 sed -i '/^Port /d' /tmp/sshd_config
 echo "Port $NEW_SSH_PORT" | cat - /tmp/sshd_config > /tmp/sshd_config.new
 mv /tmp/sshd_config.new /tmp/sshd_config
